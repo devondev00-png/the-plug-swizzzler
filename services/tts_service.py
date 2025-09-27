@@ -1,7 +1,11 @@
 import os
 import tempfile
 from typing import Optional
-import pyttsx3
+try:
+    import pyttsx3
+    PYTTSX3_AVAILABLE = True
+except ImportError:
+    PYTTSX3_AVAILABLE = False
 from gtts import gTTS
 import io
 
@@ -12,6 +16,10 @@ class TTSService:
     
     def _init_engine(self):
         """Initialize the TTS engine"""
+        if not PYTTSX3_AVAILABLE:
+            print("pyttsx3 not available, using gTTS only")
+            return
+            
         try:
             self.engine = pyttsx3.init()
             # Configure voice properties
@@ -98,7 +106,7 @@ class TTSService:
         ])
         
         # Add pyttsx3 voices if available
-        if self.engine:
+        if PYTTSX3_AVAILABLE and self.engine:
             try:
                 system_voices = self.engine.getProperty('voices')
                 for voice in system_voices:

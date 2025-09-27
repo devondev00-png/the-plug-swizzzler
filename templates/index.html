@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Plug Swizzler</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* The Plug Swizzler Brand Colors */
+            --plug-silver: #C0C0C0;
+            --neon-blue: #00BFFF;
+            --neon-green: #00FF7F;
+            --neon-red: #FF1744;
+            --neon-cyan: #00FFFF;
+            
+            /* Backgrounds */
+            --pure-black: #000000;
+            --tech-dark: #0d1117;
+            --deep-gradient-start: #0a0a0a;
+            --deep-gradient-end: #1a1a2e;
+            
+            /* Primary Colors */
+            --primary-color: #00BFFF;
+            --secondary-color: #C0C0C0;
+            --success-color: #00FF7F;
+            --warning-color: #FFC107;
+            --danger-color: #FF1744;
+            --info-color: #00FFFF;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--deep-gradient-start) 0%, var(--deep-gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--plug-silver);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--deep-gradient-start) 0%, var(--deep-gradient-end) 100%);
+            border-bottom: 1px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+        
+        .card-hover {
+            background: var(--tech-dark);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+            color: var(--plug-silver);
+        }
+
+        /* Neon Glow Effects */
+        .neon-glow {
+            box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+        }
+
+        .neon-green-glow {
+            box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
+        }
+
+        .neon-red-glow {
+            box-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red), 0 0 30px var(--neon-red);
+        }
+
+        .neon-cyan-glow {
+            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+        }
+        
+        .line-glow {
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        /* Custom Error Notification */
+        .error-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--tech-dark);
+            border: 1px solid var(--neon-red);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 0 20px var(--neon-red);
+            color: var(--plug-silver);
+            z-index: 1000;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .error-notification .error-title {
+            color: var(--neon-red);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .error-notification .error-message {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .error-notification .error-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: var(--neon-red);
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Custom Button Styles */
+        .btn-primary {
+            background: var(--neon-blue) !important;
+            border-color: var(--neon-blue) !important;
+            color: white !important;
+            box-shadow: 0 0 15px var(--neon-blue) !important;
+        }
+
+        .btn-success {
+            background: var(--neon-green) !important;
+            border-color: var(--neon-green) !important;
+            color: white !important;
+            box-shadow: 0 0 15px var(--neon-green) !important;
+        }
+
+        .btn-danger {
+            background: var(--neon-red) !important;
+            border-color: var(--neon-red) !important;
+            color: white !important;
+            box-shadow: 0 0 15px var(--neon-red) !important;
+        }
+
+        /* Form Controls */
+        .form-control {
+            background: var(--tech-dark) !important;
+            border: 1px solid var(--neon-blue) !important;
+            color: var(--plug-silver) !important;
+            box-shadow: 0 0 10px var(--neon-blue) !important;
+        }
+
+        .form-control:focus {
+            border-color: var(--neon-blue) !important;
+            box-shadow: 0 0 15px var(--neon-blue) !important;
+        }
+
+        /* Text Colors */
+        .text-primary {
+            color: var(--plug-silver) !important;
+        }
+
+        .text-neon-blue {
+            color: #00BFFF !important;
+            text-shadow: none;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            color: #00BFFF !important;
+        }
+        
+        .form-label {
+            color: #00BFFF !important;
+        }
+        
+        /* Ensure all important text is visible */
+        label, span, button, h1, h2, h3, h4, h5, h6 {
+            color: #00BFFF !important;
+        }
+        
+        .form-control {
+            color: #E5E5E5 !important;
+        }
+
+        .text-neon-green {
+            color: var(--neon-green) !important;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .text-neon-red {
+            color: var(--neon-red) !important;
+            text-shadow: 0 0 10px var(--neon-red);
+        }
+
+        .text-neon-cyan {
+            color: var(--neon-cyan) !important;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .text-plug-silver {
+            color: var(--plug-silver) !important;
+        }
+
+        .bg-tech-dark {
+            background: var(--tech-dark) !important;
+        }
+
+        .bg-pure-black {
+            background: var(--pure-black) !important;
+        }
+
+        .border-neon-blue {
+            border-color: var(--neon-blue) !important;
+        }
+
+        .border-neon-green {
+            border-color: var(--neon-green) !important;
+        }
+
+        .border-neon-red {
+            border-color: var(--neon-red) !important;
+        }
+
+        .border-neon-cyan {
+            border-color: var(--neon-cyan) !important;
+        }
+    </style>
+</head>
+<body>
+    <div x-data="callScriptApp()" class="min-h-screen">
+        <!-- Header -->
+        <header class="gradient-bg text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-plug text-3xl text-neon-blue"></i>
+                        <h1 class="text-3xl font-bold text-neon-blue">The Plug Swizzler</h1>
+                    </div>
+                    <div class="flex items-center space-x-8">
+                        <button @click="loadAllData()" 
+                                class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                            <i class="fas fa-refresh mr-2"></i>Reload Data
+                        </button>
+                        <button @click="showTrainingData = !showTrainingData" 
+                                class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                            <i class="fas fa-database mr-2"></i>Training Data
+                        </button>
+                        <button @click="showScriptLibrary = !showScriptLibrary" 
+                                class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                            <i class="fas fa-folder mr-2"></i>Script Library
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Script Generation Form -->
+            <div class="bg-tech-dark rounded-xl shadow-lg p-8 mb-8 card-hover">
+                <h2 class="text-2xl font-bold mb-6 text-center" style="color: #00BFFF !important;">
+                    <i class="fas fa-plug mr-2" style="color: #00BFFF !important;"></i>
+                    <span x-text="form.script_type === 'autocall' ? 'Generate Auto-Call Script' : form.script_type === 'humanized' ? 'Generate Humanized Script' : form.script_type === 'both' ? 'Generate Auto-Call + Humanized Script' : 'Generate Script'"></span>
+                </h2>
+                
+                <form @submit.prevent="generateScript" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Script Type -->
+                        <div class="text-center">
+                            <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Script Type</label>
+                            <select x-model="form.script_type" 
+                                    class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto">
+                                <option value="autocall">Auto-Call Bot Script</option>
+                                <option value="humanized">Humanized Script</option>
+                                <option value="both">Both Auto-Call + Humanized</option>
+                            </select>
+                        </div>
+
+                        <!-- Call Type -->
+                        <div class="text-center">
+                            <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Call Type</label>
+                            <select x-model="form.call_type" 
+                                    class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto">
+                                <option value="">Select call type...</option>
+                                <option value="inbound">Inbound Call (Customer calling you)</option>
+                                <option value="outbound">Outbound Call (You calling customer)</option>
+                            </select>
+                        </div>
+
+                        <!-- Company Selection -->
+                        <div class="text-center">
+                            <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Company</label>
+                            <select x-model="form.voice_id"
+                                    class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto">
+                            <option value="use_prompt">Use Prompt (Default)</option>
+                            <optgroup label="UK Banks">
+                                <option value="natwest">NatWest Bank</option>
+                                <option value="barclays">Barclays Bank</option>
+                                <option value="hsbc">HSBC Bank</option>
+                                <option value="lloyds">Lloyds Bank</option>
+                                <option value="santander">Santander Bank</option>
+                            </optgroup>
+                            <optgroup label="US Banks">
+                                <option value="jpmorgan">JPMorgan Chase</option>
+                                <option value="bank_of_america">Bank of America</option>
+                                <option value="wells_fargo">Wells Fargo</option>
+                            </optgroup>
+                            <optgroup label="Australian Banks">
+                                <option value="commonwealth_bank">Commonwealth Bank of Australia</option>
+                                <option value="anz">ANZ Bank</option>
+                            </optgroup>
+                            <optgroup label="German Banks">
+                                <option value="deutsche_bank">Deutsche Bank</option>
+                            </optgroup>
+                            <optgroup label="Tech Companies">
+                                <option value="google">Google</option>
+                                <option value="microsoft">Microsoft</option>
+                                <option value="apple">Apple</option>
+                                <option value="amazon">Amazon</option>
+                            </optgroup>
+                            <optgroup label="Retail & E-commerce">
+                                <option value="asos">ASOS</option>
+                                <option value="tesco">Tesco</option>
+                                <option value="sainsburys">Sainsbury's</option>
+                                <option value="next">Next</option>
+                                <option value="primark">Primark</option>
+                            </optgroup>
+                            <optgroup label="Utilities & Services">
+                                <option value="british_gas">British Gas</option>
+                                <option value="edf_energy">EDF Energy</option>
+                                <option value="thames_water">Thames Water</option>
+                                <option value="bt">BT</option>
+                                <option value="sky">Sky</option>
+                            </optgroup>
+                                <option x-show="companyVoices.length === 0" disabled>Loading voices...</option>
+                            </select>
+                        </div>
+
+                        <!-- Script Category -->
+                        <div class="text-center">
+                            <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Script Category</label>
+                            <select x-model="form.script_mode" 
+                                    class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto">
+                                <option value="general">General</option>
+                                <option value="banking">Banking</option>
+                                <option value="fraud">Fraud Prevention</option>
+                                <option value="shopping">Shopping/E-commerce</option>
+                                <option value="debt_collection">Debt Collection</option>
+                                <option value="payment_processing">Payment Processing</option>
+                                <option value="insurance">Insurance</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="telecom">Telecommunications</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="government">Government</option>
+                                <option value="education">Education</option>
+                                <option value="real_estate">Real Estate</option>
+                                <option value="travel">Travel</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="tech_support">Tech Support</option>
+                                <option value="sales">Sales</option>
+                                <option value="customer_service">Customer Service</option>
+                                <option value="appointment_booking">Appointment Booking</option>
+                                <option value="survey">Survey</option>
+                                <option value="verification">Verification</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Human Voice Selection (for Humanized and Both) -->
+                    <div x-show="form.script_type === 'humanized' || form.script_type === 'both'" class="text-center">
+                        <label class="block text-lg font-semibold mb-4" style="color: #00BFFF !important;">Human Voice Selection</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Accent</label>
+                                <select x-model="form.accent" 
+                                        @change="loadVoicesByAccent()"
+                                        class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto">
+                                    <option value="">Select an accent...</option>
+                                    <template x-for="accent in availableAccents" :key="accent">
+                                        <option :value="accent" x-text="accent"></option>
+                                    </template>
+                                    <option x-show="availableAccents.length === 0" disabled>Loading accents...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="text-center">
+                                <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Gender</label>
+                                <select x-model="form.gender" 
+                                        @change="loadVoicesByGender()"
+                                        class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto">
+                                    <option value="">Select gender...</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            
+                            <div class="text-center">
+                                <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Voice</label>
+                                <select x-model="form.humanized_voice_id"
+                                        class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto">
+                                    <option value="">Select a voice...</option>
+                                    <template x-for="voice in filteredHumanizedVoices" :key="voice.id">
+                                        <option :value="voice.id" x-text="voice.name + ' (' + voice.age_range + ')'"></option>
+                                    </template>
+                                    <option x-show="filteredHumanizedVoices.length === 0" disabled>Select accent and gender first</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Your Script Prompt -->
+                    <div class="text-center">
+                        <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Your Script Prompt</label>
+                        <textarea x-model="form.product_info" 
+                                  rows="4"
+                                  class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto"
+                                  placeholder="Describe exactly what you want the script to say. Be specific about your product, service, or message..."></textarea>
+                    </div>
+
+                    <!-- Negative Prompts -->
+                    <div class="text-center">
+                        <label class="block text-sm font-medium mb-2" style="color: #00BFFF !important;">Negative Prompts (What to avoid)</label>
+                        <textarea x-model="form.negative_prompts" 
+                                  rows="2"
+                                  class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control mx-auto"
+                                  placeholder="Enter what you DON'T want in the script (e.g., no mentions of saving money, no email requests, etc.)"></textarea>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="flex flex-wrap gap-4">
+                        <label class="flex items-center space-x-2">
+                            <input x-model="form.handle_objections" 
+                                   type="checkbox" 
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                            <span class="text-sm font-medium text-plug-silver">Include Objection Handling</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input x-model="form.use_training_data" 
+                                   type="checkbox" 
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                            <span class="text-sm font-medium text-plug-silver">Use Training Data</span>
+                        </label>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="flex justify-center">
+                        <button type="submit" 
+                                :disabled="loading"
+                                class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow font-bold"
+                                style="color: #00BFFF !important;">
+                            <i class="fas fa-magic mr-2"></i>
+                            <span x-text="loading ? 'Generating...' : 'Generate Script'"></span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Script Display -->
+                <div x-show="generatedScript || generatedScriptData" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     class="mt-8">
+                    
+                    <!-- Single Script Display (autocall or humanized) -->
+                    <div x-show="generatedScriptData && generatedScriptData.script_type !== 'both'">
+                        <div class="bg-pure-black rounded-lg p-6 mb-6 neon-glow">
+                            <pre x-text="generatedScript" class="whitespace-pre-wrap text-white font-mono text-sm leading-relaxed"></pre>
+                        </div>
+                    </div>
+                    
+                    <!-- Both Scripts Display -->
+                    <div x-show="generatedScriptData && generatedScriptData.script_type === 'both'">
+                        <!-- Auto-Call Script -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-neon-blue mb-3">
+                                <i class="fas fa-robot mr-2 text-neon-blue"></i>Auto-Call Bot Script
+                            </h4>
+                            <div class="bg-pure-black rounded-lg p-6 neon-glow">
+                                <pre x-text="generatedScriptData.autocall_script ? generatedScriptData.autocall_script.script_text : 'No auto-call script available'" class="whitespace-pre-wrap text-white font-mono text-sm leading-relaxed"></pre>
+                            </div>
+                        </div>
+                        
+                        <!-- Humanized Script -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-neon-blue mb-3">
+                                <i class="fas fa-user mr-2 text-neon-blue"></i>Humanized Script
+                            </h4>
+                            <div class="bg-pure-black rounded-lg p-6 neon-blue-glow">
+                                <pre x-text="generatedScriptData.humanized_script ? generatedScriptData.humanized_script.script_text : 'No humanized script available'" class="whitespace-pre-wrap text-white font-mono text-sm leading-relaxed"></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons - Show after script content -->
+                    <div class="mt-6">
+                        <div class="flex justify-center space-x-6">
+                            <button @click="generateScript()" 
+                                    class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                                <i class="fas fa-redo mr-2"></i>Regenerate Script
+                            </button>
+                            <button @click="downloadScript('txt')" 
+                                    class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                                <i class="fas fa-download mr-2"></i>Download TXT
+                            </button>
+                            <button @click="downloadScript('json')" 
+                                    class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                                <i class="fas fa-code mr-2"></i>Download JSON
+                            </button>
+                            <button @click="generateAudio()" 
+                                    class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                                <i class="fas fa-volume-up mr-2"></i>Audio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Data Modal -->
+            <div x-show="showTrainingData" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-tech-dark rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto card-hover">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-neon-blue">Training Data Management</h3>
+                        <button @click="showTrainingData = false" 
+                                class="text-plug-silver hover:text-neon-red">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- Add Training Data Form -->
+                    <div class="mb-8">
+                        <h4 class="text-lg font-semibold mb-4 text-neon-blue">Add Training Data</h4>
+                        <form @submit.prevent="addTrainingData" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-plug-silver mb-2">Data Type</label>
+                                    <select x-model="trainingForm.data_type" 
+                                            required
+                                            class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control">
+                                        <option value="">Select data type...</option>
+                                        <option value="tweets">Tweets</option>
+                                        <option value="call_logs">Call Logs</option>
+                                        <option value="scripts">Scripts</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-plug-silver mb-2">Company</label>
+                                    <input x-model="trainingForm.company_name" 
+                                           type="text" 
+                                           required
+                                           class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control"
+                                           placeholder="Enter company name">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-plug-silver mb-2">Content</label>
+                                <textarea x-model="trainingForm.content" 
+                                          required
+                                          rows="4"
+                                          class="w-full px-4 py-3 border border-neon-blue rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent form-control"
+                                          placeholder="Enter training data content..."></textarea>
+                            </div>
+                            <button type="submit" 
+                                    class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
+                                <i class="fas fa-plus mr-2"></i>Add Training Data
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Training Data List -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-neon-blue">Existing Training Data</h4>
+                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                            <template x-for="data in trainingData" :key="data.id">
+                                <div class="bg-pure-black p-4 rounded-lg line-glow">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <span class="inline-block bg-neon-blue bg-opacity-20 text-neon-blue text-xs px-2 py-1 rounded" 
+                                                  x-text="data.data_type"></span>
+                                            <p class="mt-2 text-sm text-white" x-text="data.content"></p>
+                                        </div>
+                                        <button @click="deleteTrainingData(data.id)" 
+                                                class="text-neon-red hover:text-red-400">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Script Library Modal -->
+            <div x-show="showScriptLibrary" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-tech-dark rounded-xl p-8 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto card-hover">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-neon-blue">Script Library</h3>
+                        <button @click="showScriptLibrary = false" 
+                                class="text-plug-silver hover:text-neon-red">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <template x-for="script in scriptLibrary" :key="script.id">
+                            <div class="bg-pure-black rounded-lg p-6 neon-glow">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h4 class="font-semibold text-neon-blue" x-text="script.title"></h4>
+                                    <div class="flex space-x-2">
+                                        <button @click="loadScript(script)" 
+                                                class="text-neon-blue hover:text-neon-cyan">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button @click="deleteScript(script.id)" 
+                                                class="text-neon-red hover:text-red-400">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-white mb-2" x-text="script.script.substring(0, 100) + '...'"></p>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="tag in script.tags" :key="tag">
+                                        <span class="bg-neon-blue bg-opacity-20 text-neon-blue text-xs px-2 py-1 rounded" 
+                                              x-text="tag"></span>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div x-show="loading" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-tech-dark rounded-xl p-8 text-center card-hover">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-blue mx-auto mb-4"></div>
+                <p class="text-lg font-semibold text-neon-blue">Generating your script...</p>
+            </div>
+        </div>
+        
+        <!-- Error Notification -->
+        <div x-show="errorNotification" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform translate-x-full"
+             x-transition:enter-end="opacity-100 transform translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform translate-x-0"
+             x-transition:leave-end="opacity-0 transform translate-x-full"
+             class="error-notification">
+            <button @click="hideError()" class="error-close">&times;</button>
+            <div class="error-title" x-text="errorNotification?.title"></div>
+            <div class="error-message" x-text="errorNotification?.message"></div>
+        </div>
+    </div>
+
+    <script>
+        function callScriptApp() {
+            return {
+                // Form data
+                form: {
+                    script_type: 'autocall',
+                    voice_id: 'use_prompt',
+                    humanized_voice_id: '',
+                    accent: '',
+                    gender: '',
+                    call_type: '',
+                    script_mode: 'general',
+                    product_info: '',
+                    negative_prompts: '',
+                    handle_objections: false,
+                    use_training_data: false
+                },
+                
+                // Training data form
+                trainingForm: {
+                    data_type: '',
+                    company_name: '',
+                    content: ''
+                },
+                
+                // State
+                loading: false,
+                generatedScript: '',
+                generatedScriptData: null,
+                showTrainingData: false,
+                showScriptLibrary: false,
+                trainingData: [],
+                scriptLibrary: [],
+                errorNotification: null,
+                
+                // Voice data
+                companyVoices: [],
+                humanizedVoices: [],
+                filteredHumanizedVoices: [],
+                availableAccents: [],
+                
+                // Initialize
+                async init() {
+                    console.log('Initializing app...');
+                    try {
+                        await this.loadCompanyVoices();
+                        await this.loadHumanizedVoices();
+                        await this.loadAccents();
+                        console.log('All data loaded successfully');
+                        console.log('Company voices count:', this.companyVoices.length);
+                        console.log('Humanized voices count:', this.humanizedVoices.length);
+                        console.log('Accents count:', this.availableAccents.length);
+                    } catch (error) {
+                        console.error('Error during initialization:', error);
+                    }
+                },
+                
+                // Manual load function for debugging
+                async loadAllData() {
+                    console.log('Manually loading all data...');
+                    await this.loadCompanyVoices();
+                    await this.loadHumanizedVoices();
+                    await this.loadAccents();
+                    
+                    // Force update the UI
+                    this.$nextTick(() => {
+                        console.log('UI updated - Company voices:', this.companyVoices.length);
+                        console.log('UI updated - Humanized voices:', this.humanizedVoices.length);
+                        console.log('UI updated - Accents:', this.availableAccents.length);
+                    });
+                },
+                
+                // Load company voices
+                async loadCompanyVoices() {
+                    try {
+                        console.log('Loading company voices...');
+                        const response = await fetch('http://localhost:8000/company-voices');
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        this.companyVoices = data.voices || data;
+                        console.log('Company voices loaded:', this.companyVoices.length);
+                        console.log('Company voices data:', this.companyVoices);
+                    } catch (error) {
+                        console.error('Error loading company voices:', error);
+                        this.companyVoices = [];
+                    }
+                },
+                
+                // Load humanized voices
+                async loadHumanizedVoices() {
+                    try {
+                        console.log('Loading humanized voices...');
+                        const response = await fetch('http://localhost:8000/humanized-voices');
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        this.humanizedVoices = data.voices || data;
+                        console.log('Humanized voices loaded:', this.humanizedVoices.length);
+                        console.log('Humanized voices data:', this.humanizedVoices);
+                    } catch (error) {
+                        console.error('Error loading humanized voices:', error);
+                        this.humanizedVoices = [];
+                    }
+                },
+                
+                // Load accents
+                async loadAccents() {
+                    try {
+                        console.log('Loading accents...');
+                        const response = await fetch('http://localhost:8000/humanized-voices/accents');
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        this.availableAccents = data.accents || data;
+                        console.log('Accents loaded:', this.availableAccents);
+                        console.log('Accents data:', this.availableAccents);
+                    } catch (error) {
+                        console.error('Error loading accents:', error);
+                        this.availableAccents = [];
+                    }
+                },
+                
+                // Load voices by accent
+                loadVoicesByAccent() {
+                    console.log('Loading voices by accent:', this.form.accent);
+                    this.filteredHumanizedVoices = this.humanizedVoices.filter(voice => 
+                        voice.accent === this.form.accent
+                    );
+                    console.log('Filtered voices:', this.filteredHumanizedVoices.length);
+                    this.form.gender = '';
+                    this.form.humanized_voice_id = '';
+                },
+                
+                // Load voices by gender
+                loadVoicesByGender() {
+                    console.log('Loading voices by gender:', this.form.gender);
+                    this.filteredHumanizedVoices = this.humanizedVoices.filter(voice => 
+                        voice.accent === this.form.accent && voice.gender === this.form.gender
+                    );
+                    console.log('Final filtered voices:', this.filteredHumanizedVoices.length);
+                    this.form.voice_id = '';
+                },
+                
+                // Methods
+                async generateScript() {
+                    console.log('Starting script generation...');
+                    console.log('Form data:', this.form);
+                    
+                    // Validate form
+                    if (!this.form.script_type) {
+                        this.showError('Validation Error', 'Please select a script type');
+                        return;
+                    }
+                    
+                    if (this.form.script_type === 'autocall' || this.form.script_type === 'both') {
+                        if (!this.form.voice_id) {
+                            this.showError('Validation Error', 'Please select a company voice for auto-call script');
+                            return;
+                        }
+                    }
+                    
+                    if (this.form.script_type === 'humanized' || this.form.script_type === 'both') {
+                        if (!this.form.humanized_voice_id) {
+                            this.form.humanized_voice_id = 'british_man_young'; // Default fallback
+                        }
+                    }
+                    
+                    if (!this.form.call_type) {
+                        this.showError('Validation Error', 'Please select call type (inbound or outbound)');
+                        return;
+                    }
+                    
+                    if (!this.form.product_info.trim()) {
+                        this.showError('Validation Error', 'Please enter your script prompt');
+                        return;
+                    }
+                    
+                    this.loading = true;
+                    try {
+                        console.log('Generating script with:', this.form);
+                        
+                        const formData = new FormData();
+                        formData.append('script_type', this.form.script_type);
+                        formData.append('voice_id', this.form.voice_id || '');
+                        formData.append('humanized_voice_id', this.form.humanized_voice_id || '');
+                        formData.append('call_type', this.form.call_type);
+                        formData.append('script_mode', this.form.script_mode || 'general');
+                        formData.append('product_info', this.form.product_info);
+                        formData.append('negative_prompts', this.form.negative_prompts || '');
+                        
+                        const response = await fetch('http://localhost:8000/generate-script', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Failed to generate script: ${response.status} - ${errorText}`);
+                        }
+                        
+                        const result = await response.json();
+                        console.log('Script generated successfully:', result);
+                        console.log('Script text:', result.script_text);
+                        console.log('Script type:', result.script_type);
+                        
+                        if (result.script_type === 'both') {
+                            // Handle both scripts
+                            this.generatedScript = result.autocall_script ? result.autocall_script.script_text : result.script_text;
+                            this.generatedScriptData = result;
+                            console.log('Both scripts - generatedScript:', this.generatedScript);
+                        } else {
+                            // Handle single script (autocall or humanized)
+                            this.generatedScript = result.script_text;
+                            this.generatedScriptData = result;
+                            console.log('Single script - generatedScript:', this.generatedScript);
+                        }
+                        
+                        console.log('Final generatedScript:', this.generatedScript);
+                        console.log('Final generatedScriptData:', this.generatedScriptData);
+                        
+                        // Force UI update
+                        this.$nextTick(() => {
+                            console.log('UI updated - generatedScript:', this.generatedScript);
+                            console.log('UI updated - generatedScriptData:', this.generatedScriptData);
+                        });
+                        
+                        // Clear loading state
+                        this.loading = false;
+                        
+                        // Show success message
+                        this.showSuccess('Script Generated Successfully!', 'Your script has been generated and is ready for download.');
+                        
+                        // Add to script library
+                        if (result.script_type === 'both') {
+                            this.scriptLibrary.unshift({
+                                id: Date.now(),
+                                title: `Both Scripts - ${this.form.product_info.substring(0, 30)}...`,
+                                script: result.autocall_script.script_text,
+                                tags: ['both', this.form.voice_id, this.form.humanized_voice_id]
+                            });
+                        } else {
+                            this.scriptLibrary.unshift({
+                                id: Date.now(),
+                                title: `${this.form.script_type} - ${this.form.product_info.substring(0, 30)}...`,
+                                script: result.script_text,
+                                tags: [this.form.script_type, this.form.voice_id || this.form.humanized_voice_id]
+                            });
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error generating script:', error);
+                        this.showError('Script Generation Error', 'Error generating script: ' + error.message);
+                        this.loading = false;
+                    }
+                },
+                
+                async addTrainingData() {
+                    try {
+                        const response = await fetch('/training-data', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(this.trainingForm)
+                        });
+                        
+                        if (response.ok) {
+                            this.trainingData.push({
+                                id: Date.now(),
+                                ...this.trainingForm
+                            });
+                            this.trainingForm = {
+                                data_type: '',
+                                company_name: '',
+                                content: ''
+                            };
+                        }
+                        
+                    } catch (error) {
+                        this.showError('Training Data Error', 'Error adding training data: ' + error.message);
+                    }
+                },
+                
+                deleteTrainingData(id) {
+                    this.trainingData = this.trainingData.filter(data => data.id !== id);
+                },
+                
+                loadScript(script) {
+                    this.form.product_info = script.script;
+                    this.showScriptLibrary = false;
+                },
+                
+                deleteScript(id) {
+                    this.scriptLibrary = this.scriptLibrary.filter(script => script.id !== id);
+                },
+                
+                async downloadScript(format) {
+                    try {
+                        let content, filename, mimeType;
+                        
+                        if (this.generatedScriptData && this.generatedScriptData.script_type === 'both') {
+                            if (format === 'json') {
+                                content = JSON.stringify(this.generatedScriptData, null, 2);
+                                filename = 'both_scripts.json';
+                                mimeType = 'application/json';
+                            } else {
+                                content = `AUTO-CALL SCRIPT:\n\n${this.generatedScriptData.autocall_script.script_text}\n\nHUMANIZED SCRIPT:\n\n${this.generatedScriptData.humanized_script.script_text}`;
+                                filename = 'both_scripts.txt';
+                                mimeType = 'text/plain';
+                            }
+                        } else {
+                            if (format === 'json') {
+                                content = JSON.stringify(this.generatedScriptData || {script: this.generatedScript}, null, 2);
+                                filename = 'script.json';
+                                mimeType = 'application/json';
+                            } else {
+                                content = this.generatedScript;
+                                filename = 'script.txt';
+                                mimeType = 'text/plain';
+                            }
+                        }
+                        
+                        const blob = new Blob([content], { type: mimeType });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        
+                    } catch (error) {
+                        this.showError('Download Error', 'Error downloading script: ' + error.message);
+                    }
+                },
+                
+                async generateAudio() {
+                    if (!this.generatedScriptData || !this.generatedScriptData.audio_data) {
+                        this.showError('Audio Error', 'No audio available for this script');
+                        return;
+                    }
+                    
+                    try {
+                        // Convert base64 to audio blob
+                        const audioBlob = new Blob([Uint8Array.from(atob(this.generatedScriptData.audio_data), c => c.charCodeAt(0))], { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        
+                        // Create audio element and play
+                        const audio = new Audio(audioUrl);
+                        audio.play();
+                        
+                        // Clean up URL after playing
+                        audio.onended = () => URL.revokeObjectURL(audioUrl);
+                        
+                    } catch (error) {
+                        console.error('Error playing audio:', error);
+                        this.showError('Audio Playback Error', 'Error playing audio: ' + error.message);
+                    }
+                },
+                
+                // Error notification methods
+                showError(title, message) {
+                    this.errorNotification = {
+                        title: title,
+                        message: message
+                    };
+                    
+                    // Auto-hide after 5 seconds
+                    setTimeout(() => {
+                        this.hideError();
+                    }, 5000);
+                },
+                
+                hideError() {
+                    this.errorNotification = null;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

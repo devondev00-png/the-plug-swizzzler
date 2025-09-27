@@ -26,7 +26,7 @@ from services.script_generator_service import ScriptGeneratorService
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="The Plug Swizzler Gen",
+    title="The Plug Swizzler",
     description="Generate personalized call scripts with custom training and memory system",
     version="1.0.0"
 )
@@ -57,7 +57,7 @@ async def startup_event():
 @app.get("/")
 async def root():
     return {
-        "message": "The Plug Swizzler Gen API",
+        "message": "The Plug Swizzler API",
         "version": "1.0.0",
         "description": "Generate personalized call scripts with custom training and memory system",
         "endpoints": {

@@ -18,7 +18,7 @@ class Settings:
     OPENAI_MAX_TOKENS = int(os.getenv("OPENAI_MAX_TOKENS", "1500"))
     
     # TTS Configuration
-    TTS_ENGINE = os.getenv("TTS_ENGINE", "pyttsx3")  # pyttsx3 or gtts
+    TTS_ENGINE = os.getenv("TTS_ENGINE", "gtts")  # Changed to gtts since pyttsx3 has issues
     TTS_VOICE = os.getenv("TTS_VOICE", "default")
     
     # Export Configuration
@@ -129,8 +129,16 @@ def validate_settings():
     required_settings = ["OPENAI_API_KEY"]
     missing_settings = []
     
+    # Debug: Print all environment variables
+    print("🔍 Debug: Environment variables:")
+    for key, value in os.environ.items():
+        if 'OPENAI' in key.upper() or 'SECRET' in key.upper():
+            print(f"  {key}: {value[:10]}..." if value else f"  {key}: None")
+    
     for setting in required_settings:
-        if not getattr(settings, setting):
+        value = getattr(settings, setting)
+        print(f"🔍 Debug: {setting} = {value[:10] if value else 'None'}...")
+        if not value:
             missing_settings.append(setting)
     
     if missing_settings:

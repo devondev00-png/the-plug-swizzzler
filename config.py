@@ -130,14 +130,14 @@ def validate_settings():
     missing_settings = []
     
     # Debug: Print all environment variables
-    print("🔍 Debug: Environment variables:")
+    print("Debug: Environment variables:")
     for key, value in os.environ.items():
         if 'OPENAI' in key.upper() or 'SECRET' in key.upper():
             print(f"  {key}: {value[:10]}..." if value else f"  {key}: None")
     
     for setting in required_settings:
         value = getattr(settings, setting)
-        print(f"🔍 Debug: {setting} = {value[:10] if value else 'None'}...")
+        print(f"Debug: {setting} = {value[:10] if value else 'None'}...")
         if not value:
             missing_settings.append(setting)
     

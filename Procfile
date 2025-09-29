@@ -1,1 +1,1 @@
-web: python minimal_run.py
+web: python simple_app.py

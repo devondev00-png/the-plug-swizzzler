@@ -3,42 +3,73 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def safe_getenv(key, default=None):
+    """Safely get environment variable with error handling"""
+    try:
+        return os.getenv(key, default)
+    except Exception as e:
+        print(f"Warning: Error reading environment variable {key}: {e}")
+        return default
+
+def safe_bool(value, default=False):
+    """Safely convert string to boolean"""
+    try:
+        if isinstance(value, bool):
+            return value
+        return str(value).lower() == "true"
+    except:
+        return default
+
+def safe_int(value, default=0):
+    """Safely convert string to integer"""
+    try:
+        return int(value)
+    except:
+        return default
+
+def safe_float(value, default=0.0):
+    """Safely convert string to float"""
+    try:
+        return float(value)
+    except:
+        return default
+
 class Settings:
     # API Configuration
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here")
-    DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+    OPENAI_API_KEY = safe_getenv("OPENAI_API_KEY")
+    SECRET_KEY = safe_getenv("SECRET_KEY", "your-secret-key-here")
+    DEBUG = safe_bool(safe_getenv("DEBUG", "False"))
     
     # Database Configuration
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./call_scripts.db")
+    DATABASE_URL = safe_getenv("DATABASE_URL", "sqlite:///./call_scripts.db")
     
     # OpenAI Configuration
-    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4")
-    OPENAI_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.8"))
-    OPENAI_MAX_TOKENS = int(os.getenv("OPENAI_MAX_TOKENS", "1500"))
+    OPENAI_MODEL = safe_getenv("OPENAI_MODEL", "gpt-4")
+    OPENAI_TEMPERATURE = safe_float(safe_getenv("OPENAI_TEMPERATURE", "0.8"))
+    OPENAI_MAX_TOKENS = safe_int(safe_getenv("OPENAI_MAX_TOKENS", "1500"))
     
     # TTS Configuration
-    TTS_ENGINE = os.getenv("TTS_ENGINE", "gtts")  # Changed to gtts since pyttsx3 has issues
-    TTS_VOICE = os.getenv("TTS_VOICE", "default")
+    TTS_ENGINE = safe_getenv("TTS_ENGINE", "gtts")
+    TTS_VOICE = safe_getenv("TTS_VOICE", "default")
     
     # Export Configuration
-    EXPORT_DIR = os.getenv("EXPORT_DIR", "./exports")
-    MAX_EXPORT_SIZE = int(os.getenv("MAX_EXPORT_SIZE", "10485760"))  # 10MB
+    EXPORT_DIR = safe_getenv("EXPORT_DIR", "./exports")
+    MAX_EXPORT_SIZE = safe_int(safe_getenv("MAX_EXPORT_SIZE", "10485760"))
     
     # Rate Limiting
-    RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
+    RATE_LIMIT_PER_MINUTE = safe_int(safe_getenv("RATE_LIMIT_PER_MINUTE", "60"))
     
     # CORS Configuration
-    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
+    CORS_ORIGINS = safe_getenv("CORS_ORIGINS", "*").split(",")
     
     # Logging Configuration
-    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-    LOG_FILE = os.getenv("LOG_FILE", "app.log")
+    LOG_LEVEL = safe_getenv("LOG_LEVEL", "INFO")
+    LOG_FILE = safe_getenv("LOG_FILE", "app.log")
     
     # Feature Flags
-    ENABLE_TTS = os.getenv("ENABLE_TTS", "True").lower() == "true"
-    ENABLE_EXPORT = os.getenv("ENABLE_EXPORT", "True").lower() == "true"
-    ENABLE_ANALYTICS = os.getenv("ENABLE_ANALYTICS", "False").lower() == "true"
+    ENABLE_TTS = safe_bool(safe_getenv("ENABLE_TTS", "True"))
+    ENABLE_EXPORT = safe_bool(safe_getenv("ENABLE_EXPORT", "True"))
+    ENABLE_ANALYTICS = safe_bool(safe_getenv("ENABLE_ANALYTICS", "False"))
     
     # Brand Voice Defaults
     DEFAULT_BRAND_VOICES = {
@@ -133,12 +164,19 @@ def validate_settings():
     print("Debug: Environment variables:")
     for key, value in os.environ.items():
         if 'OPENAI' in key.upper() or 'SECRET' in key.upper():
-            print(f"  {key}: {value[:10]}..." if value else f"  {key}: None")
+            try:
+                print(f"  {key}: {value[:10]}..." if value else f"  {key}: None")
+            except:
+                print(f"  {key}: [ERROR reading value]")
     
     for setting in required_settings:
-        value = getattr(settings, setting)
-        print(f"Debug: {setting} = {value[:10] if value else 'None'}...")
-        if not value:
+        try:
+            value = getattr(settings, setting)
+            print(f"Debug: {setting} = {value[:10] if value else 'None'}...")
+            if not value:
+                missing_settings.append(setting)
+        except Exception as e:
+            print(f"Debug: {setting} = ERROR: {e}")
             missing_settings.append(setting)
     
     if missing_settings:

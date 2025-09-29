@@ -534,6 +534,125 @@ async def export_autocall_script(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# DD9 Stealth Payload Generation
+@app.post("/generate-dd9-payload")
+async def generate_dd9_payload(
+    script_type: str = Form(...),
+    voice_id: str = Form(None),
+    humanized_voice_id: str = Form(None),
+    call_type: str = Form(...),
+    script_mode: str = Form(...),
+    product_info: str = Form(...),
+    negative_prompts: str = Form(""),
+    payload_type: str = Form("stealth"),  # stealth, aggressive, professional
+    db: Session = Depends(get_db)
+):
+    """Generate DD9 Stealth Payload based on selected options"""
+    try:
+        company_voice_service = CompanyVoiceService(db)
+        script_generator = ScriptGeneratorService(db, company_voice_service)
+        
+        # Generate the base script first
+        base_script = script_generator.generate_script(
+            script_type=script_type,
+            voice_id=voice_id or humanized_voice_id,
+            call_type=call_type,
+            script_mode=script_mode,
+            product_info=product_info,
+            negative_prompts=negative_prompts
+        )
+        
+        # Generate DD9 stealth payload variations
+        stealth_payloads = {
+            "original": base_script,
+            "stealth_soft": generate_stealth_variation(base_script, "soft"),
+            "stealth_aggressive": generate_stealth_variation(base_script, "aggressive"),
+            "stealth_professional": generate_stealth_variation(base_script, "professional"),
+            "stealth_casual": generate_stealth_variation(base_script, "casual")
+        }
+        
+        return {
+            "payloads": stealth_payloads,
+            "metadata": {
+                "script_type": script_type,
+                "voice_id": voice_id,
+                "call_type": call_type,
+                "script_mode": script_mode,
+                "payload_type": payload_type,
+                "generated_at": "2024-01-01T00:00:00Z"
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+def generate_stealth_variation(script, variation_type):
+    """Generate stealth variations of the script"""
+    base_text = script.get("script_text", "") if isinstance(script, dict) else str(script)
+    
+    variations = {
+        "soft": {
+            "prefix": "Hi there, I hope you're having a great day. ",
+            "suffix": " I really appreciate you taking the time to listen.",
+            "replacements": {
+                "urgent": "when you have a moment",
+                "immediately": "at your convenience",
+                "must": "would really appreciate if you could",
+                "need to": "would love to"
+            }
+        },
+        "aggressive": {
+            "prefix": "Listen up, this is important. ",
+            "suffix": " Don't waste my time or yours.",
+            "replacements": {
+                "please": "",
+                "would you": "you will",
+                "could you": "you need to",
+                "if possible": ""
+            }
+        },
+        "professional": {
+            "prefix": "Good day, I'm calling regarding ",
+            "suffix": " Thank you for your time and consideration.",
+            "replacements": {
+                "hey": "hello",
+                "yeah": "yes",
+                "gonna": "going to",
+                "wanna": "would like to"
+            }
+        },
+        "casual": {
+            "prefix": "Hey, how's it going? ",
+            "suffix": " Cool, thanks for listening!",
+            "replacements": {
+                "hello": "hey",
+                "thank you": "thanks",
+                "please": "",
+                "would you": "can you"
+            }
+        }
+    }
+    
+    if variation_type not in variations:
+        return base_text
+    
+    var = variations[variation_type]
+    modified_text = base_text
+    
+    # Apply replacements
+    for old, new in var["replacements"].items():
+        modified_text = modified_text.replace(old, new)
+    
+    # Add prefix and suffix
+    modified_text = var["prefix"] + modified_text + var["suffix"]
+    
+    return {
+        "script_text": modified_text,
+        "variation_type": variation_type,
+        "original_length": len(base_text),
+        "modified_length": len(modified_text)
+    }
+
 # Health check
 @app.get("/health")
 async def health_check():

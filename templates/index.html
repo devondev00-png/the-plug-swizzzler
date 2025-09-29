@@ -443,14 +443,22 @@
                         </label>
                     </div>
 
-                    <!-- Generate Button -->
-                    <div class="flex justify-center">
+                    <!-- Generate Buttons -->
+                    <div class="flex justify-center space-x-4">
                         <button type="submit" 
                                 :disabled="loading"
                                 class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow font-bold"
                                 style="color: #00BFFF !important;">
                             <i class="fas fa-magic mr-2"></i>
                             <span x-text="loading ? 'Generating...' : 'Generate Script'"></span>
+                        </button>
+                        
+                        <button @click="generateDD9Payload()" 
+                                :disabled="loading"
+                                class="bg-neon-green bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-green-glow font-bold"
+                                style="color: #00FF7F !important;">
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            <span x-text="loading ? 'Generating...' : 'Generate DD9 Stealth Payload'"></span>
                         </button>
                     </div>
                 </form>
@@ -510,6 +518,58 @@
                             <button @click="generateAudio()" 
                                     class="bg-neon-blue bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-glow">
                                 <i class="fas fa-volume-up mr-2"></i>Audio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DD9 Stealth Payload Display -->
+                <div x-show="dd9Payloads" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     class="mt-8">
+                    
+                    <div class="bg-tech-dark rounded-xl shadow-lg p-8 card-hover">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-neon-green">
+                            <i class="fas fa-shield-alt mr-2 text-neon-green"></i>
+                            DD9 Stealth Payloads
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <template x-for="(payload, key) in dd9Payloads" :key="key">
+                                <div class="bg-pure-black rounded-lg p-6 neon-green-glow">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h4 class="text-lg font-semibold text-neon-green capitalize" 
+                                            x-text="key.replace('_', ' ')"></h4>
+                                        <div class="flex space-x-2">
+                                            <button @click="copyToClipboard(payload.script_text)" 
+                                                    class="text-neon-green hover:text-neon-cyan text-sm">
+                                                <i class="fas fa-copy mr-1"></i>Copy
+                                            </button>
+                                            <button @click="downloadPayload(key, payload.script_text)" 
+                                                    class="text-neon-green hover:text-neon-cyan text-sm">
+                                                <i class="fas fa-download mr-1"></i>Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-400 mb-3" 
+                                         x-text="'Length: ' + payload.script_text.length + ' characters'"></div>
+                                    <pre x-text="payload.script_text" 
+                                         class="whitespace-pre-wrap text-white font-mono text-sm leading-relaxed max-h-40 overflow-y-auto"></pre>
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <!-- Bulk Actions -->
+                        <div class="mt-6 flex justify-center space-x-4">
+                            <button @click="downloadAllPayloads()" 
+                                    class="bg-neon-green bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-green-glow">
+                                <i class="fas fa-download mr-2"></i>Download All Payloads
+                            </button>
+                            <button @click="generateDD9Payload()" 
+                                    class="bg-neon-green bg-opacity-20 hover:bg-opacity-30 px-6 py-3 rounded-lg transition neon-green-glow">
+                                <i class="fas fa-redo mr-2"></i>Regenerate Payloads
                             </button>
                         </div>
                     </div>
@@ -703,6 +763,7 @@
                 loading: false,
                 generatedScript: '',
                 generatedScriptData: null,
+                dd9Payloads: null,
                 showTrainingData: false,
                 showScriptLibrary: false,
                 trainingData: [],
@@ -934,6 +995,132 @@
                     }
                 },
                 
+                // DD9 Stealth Payload Generation
+                async generateDD9Payload() {
+                    console.log('Starting DD9 payload generation...');
+                    console.log('Form data:', this.form);
+                    
+                    // Validate form
+                    if (!this.form.script_type) {
+                        this.showError('Validation Error', 'Please select a script type');
+                        return;
+                    }
+                    
+                    if (!this.form.call_type) {
+                        this.showError('Validation Error', 'Please select call type (inbound or outbound)');
+                        return;
+                    }
+                    
+                    if (!this.form.product_info.trim()) {
+                        this.showError('Validation Error', 'Please enter your script prompt');
+                        return;
+                    }
+                    
+                    this.loading = true;
+                    try {
+                        console.log('Generating DD9 payloads with:', this.form);
+                        
+                        const formData = new FormData();
+                        formData.append('script_type', this.form.script_type);
+                        formData.append('voice_id', this.form.voice_id || '');
+                        formData.append('humanized_voice_id', this.form.humanized_voice_id || '');
+                        formData.append('call_type', this.form.call_type);
+                        formData.append('script_mode', this.form.script_mode || 'general');
+                        formData.append('product_info', this.form.product_info);
+                        formData.append('negative_prompts', this.form.negative_prompts || '');
+                        formData.append('payload_type', 'stealth');
+                        
+                        const response = await fetch('http://localhost:8000/generate-dd9-payload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Failed to generate DD9 payloads: ${response.status} - ${errorText}`);
+                        }
+                        
+                        const result = await response.json();
+                        console.log('DD9 payloads generated successfully:', result);
+                        
+                        this.dd9Payloads = result.payloads;
+                        console.log('DD9 payloads set:', this.dd9Payloads);
+                        
+                        // Force UI update
+                        this.$nextTick(() => {
+                            console.log('UI updated - DD9 payloads:', this.dd9Payloads);
+                        });
+                        
+                        // Clear loading state
+                        this.loading = false;
+                        
+                        // Show success message
+                        this.showSuccess('DD9 Stealth Payloads Generated!', 'Your stealth payloads have been generated and are ready for use.');
+                        
+                    } catch (error) {
+                        console.error('Error generating DD9 payloads:', error);
+                        this.showError('DD9 Payload Generation Error', 'Error generating DD9 payloads: ' + error.message);
+                        this.loading = false;
+                    }
+                },
+                
+                // Copy to clipboard
+                async copyToClipboard(text) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        this.showSuccess('Copied!', 'Text copied to clipboard');
+                    } catch (error) {
+                        console.error('Error copying to clipboard:', error);
+                        this.showError('Copy Error', 'Failed to copy to clipboard');
+                    }
+                },
+                
+                // Download individual payload
+                downloadPayload(key, text) {
+                    try {
+                        const blob = new Blob([text], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `dd9_${key}_payload.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    } catch (error) {
+                        this.showError('Download Error', 'Error downloading payload: ' + error.message);
+                    }
+                },
+                
+                // Download all payloads
+                downloadAllPayloads() {
+                    if (!this.dd9Payloads) return;
+                    
+                    try {
+                        let content = 'DD9 STEALTH PAYLOADS\n';
+                        content += '===================\n\n';
+                        
+                        for (const [key, payload] of Object.entries(this.dd9Payloads)) {
+                            content += `${key.toUpperCase().replace('_', ' ')}\n`;
+                            content += '='.repeat(key.length) + '\n\n';
+                            content += payload.script_text + '\n\n';
+                            content += '-'.repeat(50) + '\n\n';
+                        }
+                        
+                        const blob = new Blob([content], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'dd9_all_payloads.txt';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    } catch (error) {
+                        this.showError('Download Error', 'Error downloading all payloads: ' + error.message);
+                    }
+                },
+                
                 async addTrainingData() {
                     try {
                         const response = await fetch('/training-data', {
@@ -1050,6 +1237,11 @@
                     setTimeout(() => {
                         this.hideError();
                     }, 5000);
+                },
+                
+                showSuccess(title, message) {
+                    // For now, just log success - you can add a success notification UI later
+                    console.log('Success:', title, message);
                 },
                 
                 hideError() {
